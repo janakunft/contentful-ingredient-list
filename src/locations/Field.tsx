@@ -4,6 +4,7 @@ import { DeleteIcon } from "@contentful/f36-icons";
 import { useSDK } from "@contentful/react-apps-toolkit";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { IngredientLine } from "../types";
 
 const APP_ID = "1bd0d702";
 const APP_KEY = "32b6ab458c23061345da3a4540c17a11";
@@ -11,9 +12,9 @@ const APP_KEY = "32b6ab458c23061345da3a4540c17a11";
 const Field = () => {
   const sdk = useSDK<FieldExtensionSDK>();
   const fieldValue = sdk.field.getValue();
-  const initialRows: Ingredient[] = fieldValue || [];
+  const initialRows: IngredientLine[] = fieldValue || [];
 
-  const [rows, setRows] = useState<Ingredient[]>(initialRows);
+  const [rows, setRows] = useState<IngredientLine[]>(initialRows);
   const [value, setValue] = useState("");
 
   const getFoodData = async () => {
@@ -30,8 +31,8 @@ const Field = () => {
       ...rows,
       {
         id: uuidv4(),
-        text: value,
-        parsed: foodData.ingredients[0]?.parsed,
+        rawText: value,
+        ...foodData,
       },
     ];
     setRows(newRows);
@@ -44,7 +45,7 @@ const Field = () => {
     if (e.key === "Enter") processEntry();
   };
 
-  const onDeleteButtonClicked = (passedRow: Ingredient) => {
+  const onDeleteButtonClicked = (passedRow: IngredientLine) => {
     const updatedRows = rows.filter(row => row !== passedRow);
     setRows(updatedRows);
   };
@@ -57,18 +58,15 @@ const Field = () => {
     <>
       <Flex flexDirection="column">
         {rows.map(row => {
-          const parsed = row.parsed;
-          const foodData = parsed ? parsed[0] : undefined;
-          // console.log(JSON.stringify(row));
-          // const {quantity} = foodData
+          const ingredient = row.ingredients?.[0]?.parsed?.[0];
           return (
             <Box key={row.id} padding="spacingXs" marginRight="spacingM">
               <Flex justifyContent="space-between">
                 <span>
                   <strong>
-                    {foodData?.quantity} {foodData?.measure}
+                    {ingredient?.quantity} {ingredient?.measure}
                   </strong>{" "}
-                  {foodData?.foodMatch}
+                  {ingredient?.foodMatch}
                 </span>
                 <DeleteIcon variant="primary" onClick={() => onDeleteButtonClicked(row)} />
               </Flex>
@@ -82,7 +80,6 @@ const Field = () => {
         placeholder="Add an ingredient"
         onKeyDown={onKeyDown}
         onChange={e => setValue(e.target.value)}
-        // onBlur={processEntry}
         value={value}
         autoComplete="false"
       />
