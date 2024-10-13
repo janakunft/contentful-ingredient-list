@@ -1,16 +1,18 @@
 import { FieldExtensionSDK } from "@contentful/app-sdk";
-import { Box, Flex, TextInput, DragHandle } from "@contentful/f36-components";
-import { DeleteIcon } from "@contentful/f36-icons";
+import { Flex, TextInput } from "@contentful/f36-components";
 import { useSDK } from "@contentful/react-apps-toolkit";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IngredientLine } from "../types";
+import IngredientRow from "../components/IngredientRow";
 
 const APP_ID = "1bd0d702";
 const APP_KEY = "32b6ab458c23061345da3a4540c17a11";
+const API_BASE_URL = "https://api.edamam.com/api";
 
 const Field = () => {
   const sdk = useSDK<FieldExtensionSDK>();
+  // const fieldId = sdk.field.id;
   const fieldValue = sdk.field.getValue();
   const initialRows: IngredientLine[] = fieldValue || [];
 
@@ -19,14 +21,13 @@ const Field = () => {
 
   const getFoodData = async () => {
     const response = await fetch(
-      `https://api.edamam.com/api/nutrition-data?app_id=${APP_ID}&app_key=${APP_KEY}&nutrition-type=cooking&ingr=${value}`
+      `${API_BASE_URL}/nutrition-data?app_id=${APP_ID}&app_key=${APP_KEY}&nutrition-type=cooking&ingr=${value}`
     );
     return await response.json();
   };
 
   const processEntry = async () => {
     const foodData = await getFoodData();
-    console.log(foodData);
     const newRows = [
       ...rows,
       {
@@ -37,7 +38,7 @@ const Field = () => {
     ];
     setRows(newRows);
     sdk.field.setValue(newRows);
-
+    // sdk.entry.fields[fieldId].setValue(newRows, "de");
     setValue("");
   };
 
@@ -57,33 +58,17 @@ const Field = () => {
 
   return (
     <>
-      <Flex flexDirection="column">
-        {rows.map(row => {
-          const ingredient = row.ingredients?.[0]?.parsed?.[0];
-          return (
-            <Flex justifyContent="space-between">
-              <Flex>
-                <DragHandle variant="transparent" label="Transparent drag handle" />
-                <span>
-                  <strong>
-                    {ingredient?.quantity} {ingredient?.measure}
-                  </strong>{" "}
-                  {ingredient?.foodMatch}
-                </span>
-              </Flex>
-              <DeleteIcon variant="primary" onClick={() => onDeleteButtonClicked(row)} />
-            </Flex>
-          );
-        })}
+      <Flex flexDirection="column" gap="8px" style={{ marginTop: "8px", marginBottom: "16px" }}>
+        {rows.map(row => (
+          <IngredientRow onDeleteButtonClicked={onDeleteButtonClicked} row={row} />
+        ))}
       </Flex>
       <TextInput
-        type="email"
-        name="email"
+        name="ingredient"
         placeholder="Add an ingredient"
         onKeyDown={onKeyDown}
         onChange={e => setValue(e.target.value)}
         value={value}
-        autoComplete="false"
       />
     </>
   );
