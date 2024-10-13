@@ -1,5 +1,5 @@
 import { FieldExtensionSDK } from "@contentful/app-sdk";
-import { Box, Flex, TextInput } from "@contentful/f36-components";
+import { Box, Flex, TextInput, DragHandle } from "@contentful/f36-components";
 import { DeleteIcon } from "@contentful/f36-icons";
 import { useSDK } from "@contentful/react-apps-toolkit";
 import { useEffect, useState } from "react";
@@ -48,6 +48,7 @@ const Field = () => {
   const onDeleteButtonClicked = (passedRow: IngredientLine) => {
     const updatedRows = rows.filter(row => row !== passedRow);
     setRows(updatedRows);
+    sdk.field.setValue(updatedRows);
   };
 
   useEffect(() => {
@@ -60,17 +61,18 @@ const Field = () => {
         {rows.map(row => {
           const ingredient = row.ingredients?.[0]?.parsed?.[0];
           return (
-            <Box key={row.id} padding="spacingXs" marginRight="spacingM">
-              <Flex justifyContent="space-between">
+            <Flex justifyContent="space-between">
+              <Flex>
+                <DragHandle variant="transparent" label="Transparent drag handle" />
                 <span>
                   <strong>
                     {ingredient?.quantity} {ingredient?.measure}
                   </strong>{" "}
                   {ingredient?.foodMatch}
                 </span>
-                <DeleteIcon variant="primary" onClick={() => onDeleteButtonClicked(row)} />
               </Flex>
-            </Box>
+              <DeleteIcon variant="primary" onClick={() => onDeleteButtonClicked(row)} />
+            </Flex>
           );
         })}
       </Flex>
