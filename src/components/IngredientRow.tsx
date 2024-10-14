@@ -9,6 +9,7 @@ import {
 } from "@contentful/f36-components";
 import { IngredientLine } from "../types";
 import { useState } from "react";
+import React from "react";
 
 type Props = {
   onDeleteButtonClicked: (passedRow: IngredientLine) => void;
@@ -60,16 +61,16 @@ export default function IngredientRow({ onDeleteButtonClicked, row }: Props) {
                 columnGap="spacingXs"
               >
                 {(Object.keys(totalNutrients) as Array<keyof typeof totalNutrients>).map(
-                  (keyName, i) => {
+                  keyName => {
                     const nutrient = totalNutrients[keyName];
                     return (
-                      <>
+                      <React.Fragment key={keyName}>
                         <GridItem>{nutrient.label}</GridItem>
                         <GridItem style={{ fontWeight: "bold", textAlign: "right" }}>
                           {nutrient.quantity.toFixed(2)}
                         </GridItem>
                         <GridItem style={{ fontWeight: "bold" }}>{nutrient.unit}</GridItem>
-                      </>
+                      </React.Fragment>
                     );
                   }
                 )}
@@ -87,12 +88,10 @@ export default function IngredientRow({ onDeleteButtonClicked, row }: Props) {
                     .map(keyName => {
                       const value = ingredient[keyName];
                       return (
-                        <>
-                          <GridItem key={keyName}>{keyName}</GridItem>
-                          <GridItem key={`${keyName}-value`} style={{ fontWeight: "bold" }}>
-                            {value}
-                          </GridItem>
-                        </>
+                        <React.Fragment key={keyName}>
+                          <GridItem>{keyName}</GridItem>
+                          <GridItem style={{ fontWeight: "bold" }}>{value}</GridItem>
+                        </React.Fragment>
                       );
                     })}
               </Grid>

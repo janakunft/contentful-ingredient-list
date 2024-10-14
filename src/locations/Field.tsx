@@ -6,13 +6,12 @@ import { v4 as uuidv4 } from "uuid";
 import { IngredientLine } from "../types";
 import IngredientRow from "../components/IngredientRow";
 
-const APP_ID = "1bd0d702";
-const APP_KEY = "32b6ab458c23061345da3a4540c17a11";
 const API_BASE_URL = "https://api.edamam.com/api";
 
 const Field = () => {
   const sdk = useSDK<FieldExtensionSDK>();
   // const fieldId = sdk.field.id;
+  const { edamamApiKey, edamamAppId } = sdk.parameters.instance;
   const fieldValue = sdk.field.getValue();
   const initialRows: IngredientLine[] = fieldValue || [];
 
@@ -21,7 +20,7 @@ const Field = () => {
 
   const getFoodData = async () => {
     const response = await fetch(
-      `${API_BASE_URL}/nutrition-data?app_id=${APP_ID}&app_key=${APP_KEY}&nutrition-type=cooking&ingr=${value}`
+      `${API_BASE_URL}/nutrition-data?app_id=${edamamAppId}&app_key=${edamamApiKey}&nutrition-type=cooking&ingr=${value}`
     );
     return await response.json();
   };
@@ -60,7 +59,7 @@ const Field = () => {
     <>
       <Flex flexDirection="column" gap="8px" style={{ marginTop: "8px", marginBottom: "16px" }}>
         {rows.map(row => (
-          <IngredientRow onDeleteButtonClicked={onDeleteButtonClicked} row={row} />
+          <IngredientRow onDeleteButtonClicked={onDeleteButtonClicked} row={row} key={row.id} />
         ))}
       </Flex>
       <TextInput
