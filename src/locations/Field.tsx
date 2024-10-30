@@ -1,6 +1,6 @@
 import { FieldExtensionSDK } from "@contentful/app-sdk";
 import { Flex, TextInput } from "@contentful/f36-components";
-import { useSDK } from "@contentful/react-apps-toolkit";
+import { useCMA, useSDK } from "@contentful/react-apps-toolkit";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IngredientLine } from "../types";
@@ -10,7 +10,8 @@ const API_BASE_URL = "https://api.edamam.com/api";
 
 const Field = () => {
   const sdk = useSDK<FieldExtensionSDK>();
-  // const fieldId = sdk.field.id;
+  const cma = useCMA();
+  const fieldId = sdk.field.id;
   const { edamamApiKey, edamamAppId } = sdk.parameters.instance;
   const fieldValue = sdk.field.getValue();
   const initialRows: IngredientLine[] = fieldValue || [];
@@ -38,6 +39,35 @@ const Field = () => {
     setRows(newRows);
     sdk.field.setValue(newRows);
     // sdk.entry.fields[fieldId].setValue(newRows, "de");
+    // cma.entry
+    //   .getMany({
+    //   query: {
+    //     content_type: "product",
+    //     "fields.internalName": "Jim's legendary coffee mug",
+    //   },
+    //   })
+    //   .then(entries => {
+    //   if (entries.items.length === 0) {
+    //     sdk.dialogs.openExtension({
+    //     title: "Create New Product",
+    //     width: 800,
+    //     parameters: {
+    //       internalName: "Jim's legendary coffee mug",
+    //     },
+    //     }).then((newEntry) => {
+    //     if (newEntry) {
+    //       console.log("New product entry created:", newEntry);
+    //     }
+    //     }).catch(error => {
+    //     console.error("Error opening dialog:", error);
+    //     });
+    //   } else {
+    //     console.log(entries.items);
+    //   }
+    //   })
+    //   .catch(error => {
+    //   console.error("Error fetching entries:", error);
+    //   });
     setValue("");
   };
 
